@@ -3,10 +3,8 @@
 
 var cc = DataStudioApp.createCommunityConnector();
 
-function isNumeric(str) {
-    if (typeof str != "string") return false // we only process strings!
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+function isNumeric(value) {
+    return /^-?\d+$/.test(value);
 }
 
 /**
@@ -104,8 +102,7 @@ function getSemanticType(value, types) {
  */
 function createField(fields, types, key, value) {
     var semanticType = getSemanticType(value, types);
-    var field =
-        semanticType == types.NUMBER ? fields.newMetric() : fields.newDimension();
+    var field = semanticType === types.NUMBER ? fields.newMetric() : fields.newDimension();
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
