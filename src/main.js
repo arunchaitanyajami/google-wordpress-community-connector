@@ -60,8 +60,6 @@ function fetchData(url) {
     }
     if (!content) sendUserError('"' + url + '" returned no content.');
 
-    sendUserError( JSON.stringify( content ) );
-
     return content;
 }
 
@@ -148,13 +146,10 @@ function getFields(request, content) {
     var types = cc.FieldType;
     var aggregations = cc.AggregationType;
 
-    if (!Array.isArray(content)) content = [content];
+    sendUserError( JSON.stringify( content[0] ) );
 
-    if (typeof content[0] !== 'object' || content[0] === null) {
-        sendUserError('Invalid JSON format');
-    }
     try {
-        createFields(fields, types, null, content[0] );
+        createFields(fields, types, null, content );
     } catch (e) {
         sendUserError('Unable to identify the data format of one of your fields.');
     }
