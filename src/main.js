@@ -148,7 +148,6 @@ function getFields(request, content) {
     var aggregations = cc.AggregationType;
 
     if (!Array.isArray(content)) content = [content];
-    sendUserError( JSON.stringify( content[0] ) );
 
     if (typeof content[0] !== 'object' || content[0] === null) {
         sendUserError('Invalid JSON format');
