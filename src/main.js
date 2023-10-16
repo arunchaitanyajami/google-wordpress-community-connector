@@ -71,22 +71,12 @@ function fetchData(url) {
  * @return  {string}          The semantic type
  */
 function getSemanticType(value, types) {
-    if ( isNumeric(value) ) {
+    if (isNumeric(value)) {
         return types.NUMBER;
     } else if (value === true || value === false) {
         return types.BOOLEAN;
-    } else if (typeof value != 'object' && value != null) {
-        if (
-            value.match(
-                new RegExp(
-                    /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi
-                )
-            )
-        ) {
-            return types.URL;
-        } else if (!isNaN(Date.parse(value))) {
-            return types.YEAR_MONTH_DAY_HOUR;
-        }
+    } else if (!isNaN(Date.parse(value))) {
+        return types.YEAR_MONTH_DAY_HOUR;
     }
 
     return types.TEXT;
