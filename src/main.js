@@ -60,7 +60,7 @@ function fetchData(url) {
     }
     if (!content) sendUserError('"' + url + '" returned no content.');
 
-    sendUserError( content );
+    sendUserError( JSON.stringify( content ) );
 
     return content;
 }
