@@ -299,6 +299,16 @@ function getColumns(content, requestedFields) {
 }
 
 /**
+ * function  `isAdminUser()`
+ *
+ * @returns {Boolean} Currently just returns false. Should return true if the current authenticated user at the time
+ *                    of function execution is an admin user of the connector.
+ */
+function isAdminUser() {
+    return false;
+}
+
+/**
  * function  `getAuthType()`
  *
  * @returns {Object} `AuthType` used by the connector.
