@@ -64,7 +64,7 @@ function getConfig(request) {
         .setId('url')
         .setName('Enter the URL of a JSON data source')
         .setHelpText('e.g. https://wp-domain-url.org/')
-        .setPlaceholder('https://wp-domain-url/');
+        .setPlaceholder('https://wp-domain-url.org/');
 
     config
         .newCheckbox()
@@ -117,13 +117,13 @@ function fetchJSON(url) {
  * @returns {Object}      The response object
  */
 function getCachedData(url) {
-    let cacheExpTime = 600,
-        cache = CacheService.getUserCache(),
-        cacheKey = url.replace(/[^a-zA-Z0-9]+/g, ''),
-        cacheKeyString = cache.get(cacheKey + '.keys'),
-        cacheKeys = cacheKeyString !== null ? cacheKeyString.split(',') : [],
-        cacheData = {},
-        content = [];
+    var cacheExpTime = 600;
+    var cache = CacheService.getUserCache();
+    var cacheKey = url.replace(/[^a-zA-Z0-9]+/g, '');
+    var cacheKeyString = cache.get(cacheKey + '.keys');
+    var cacheKeys = cacheKeyString !== null ? cacheKeyString.split(',') : [];
+    var cacheData = {};
+    var content = [];
 
     if (cacheKeyString !== null && cacheKeys.length > 0) {
         cacheData = cache.getAll(cacheKeys);
