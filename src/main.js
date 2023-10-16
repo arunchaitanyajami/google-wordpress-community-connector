@@ -71,7 +71,7 @@ function fetchData(url) {
  * @return  {string}          The semantic type
  */
 function getSemanticType(value, types) {
-    return isNumeric(value) ? types.NUMBER : types.TEXT;
+    return isNumeric( value ) ? types.NUMBER : types.TEXT;
 }
 
 /**
@@ -88,7 +88,7 @@ function createField(fields, types, key, value) {
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setDescription( 'Jami' + key );
+    field.setDescription( isNumeric( value ) + " >> " + key );
     field.setName(key);
 }
 
