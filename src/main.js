@@ -233,7 +233,7 @@ function getColumnValue(valuePaths, row) {
 
         for (var index_keys in keys) {
             var key = keys[index_keys].replace(/\s/g, '_').toLowerCase();
-            if (key == currentPath) {
+            if (key === currentPath) {
                 row = row[keys[index_keys]];
                 break;
             }
