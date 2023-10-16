@@ -86,7 +86,7 @@ function createField(fields, types, key, value) {
     var semanticType = getSemanticType(value, types);
     var field = semanticType === types.NUMBER ? fields.newMetric() : fields.newDimension();
 
-    sendUserError(JSON.stringify(value));
+    sendUserError( key + " ==== " +JSON.stringify(value));
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
