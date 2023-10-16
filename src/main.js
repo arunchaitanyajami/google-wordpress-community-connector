@@ -146,7 +146,6 @@ function getFields(request, content) {
     var types = cc.FieldType;
     var aggregations = cc.AggregationType;
 
-    sendUserError( JSON.stringify( content[0] ) );
     sendUserError( typeof content[0] );
 
     try {
