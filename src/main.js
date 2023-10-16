@@ -88,7 +88,7 @@ function createField(fields, types, key, value) {
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setDescription(isNumeric(value) + " >> " + typeof value + " >> " + Object.keys(value)[0]);
+    field.setDescription( isNumeric(value) + " >> " + typeof value + " >> " + Object.values( value )[0] );
     field.setName(key);
 }
 
@@ -127,7 +127,7 @@ function createFields(fields, types, key, value, isInline) {
             if (isInline && value[currentKey] != null) {
                 createFields(fields, types, elementKey, value[currentKey], isInline);
             } else {
-                createField(fields, types, currentKey, value);
+                createField(fields, types, currentKey, value[currentKey]);
             }
         });
     } else if (key !== null) {
