@@ -122,14 +122,14 @@ function getElementKey(key, currentKey) {
  * @param   {any[]}   value   The value of the current element
  */
 function createFields(fields, types, key, value) {
-    if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
+    if (typeof value === 'object' && value !== null) {
         Object.keys(value).forEach(function (currentKey) {
             var elementKey = getElementKey(key, currentKey);
 
             if (value[currentKey] !== null && typeof value[currentKey] === 'object') {
                 createFields(fields, types, elementKey, value[currentKey]);
             } else {
-                createField(fields, types, currentKey, value);
+                createField(fields, types, currentKey, value[currentKey]);
             }
         });
     } else if (key !== null) {
