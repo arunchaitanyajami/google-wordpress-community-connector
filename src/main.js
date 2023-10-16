@@ -1,90 +1,17 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-spread */
 
+const cc = DataStudioApp.createCommunityConnector();
+
 /**
  * Throws and logs script exceptions.
  *
  * @param {String} message The exception message
  */
 function sendUserError(message) {
-    var cc = DataStudioApp.createCommunityConnector();
     cc.newUserError()
         .setText(message)
         .throwException();
-}
-
-/**
- * function  `getAuthType()`
- *
- * @returns {Object} `AuthType` used by the connector.
- */
-function getAuthType() {
-    return {type: 'NONE'};
-}
-
-/**
- * function  `isAdminUser()`
- *
- * @returns {Boolean} Currently just returns false. Should return true if the current authenticated user at the time
- *                    of function execution is an admin user of the connector.
- */
-function isAdminUser() {
-    return false;
-}
-
-/**
- * Returns the user configurable options for the connector.
- *
- * Required function for Community Connector.
- *
- * @param   {Object} request  Config request parameters.
- * @returns {Object}          Connector configuration to be displayed to the user.
- */
-function getConfig(request) {
-    var cc = DataStudioApp.createCommunityConnector();
-    var config = cc.getConfig();
-
-    var option1 = config
-        .newOptionBuilder()
-        .setLabel('Text')
-        .setValue('text');
-
-    var option2 = config
-        .newOptionBuilder()
-        .setLabel('Inline')
-        .setValue('inline');
-
-    config
-        .newInfo()
-        .setId('instructions')
-        .setText('Fill out the form to connect to a JSON data source.');
-
-    config
-        .newTextInput()
-        .setId('url')
-        .setName('Enter the URL of a JSON data source')
-        .setHelpText('e.g. https://wp-domain-url.org/')
-        .setPlaceholder('https://wp-domain-url.org/');
-
-    config
-        .newCheckbox()
-        .setId('cache')
-        .setName('Cache response')
-        .setHelpText('Usefull with big datasets. Response is cached for 10 minutes')
-        .setAllowOverride(true);
-
-    config
-        .newSelectSingle()
-        .setId('nestedData')
-        .setName('Nested data')
-        .setHelpText('How to import nested data, as text or inline.')
-        .setAllowOverride(true)
-        .addOption(option1)
-        .addOption(option2);
-
-    config.setDateRangeRequired(false);
-
-    return config.build();
 }
 
 /**
@@ -110,56 +37,18 @@ function fetchJSON(url) {
 }
 
 /**
- * Gets cached response. If the response has not been cached, make
- * the fetchJSON call, then cache and return the response.
- *
- * @param   {string} url  The URL to get the data from
- * @returns {Object}      The response object
- */
-function getCachedData(url) {
-    var cacheExpTime = 600;
-    var cache = CacheService.getUserCache();
-    var cacheKey = url.replace(/[^a-zA-Z0-9]+/g, '');
-    var cacheKeyString = cache.get(cacheKey + '.keys');
-    var cacheKeys = cacheKeyString !== null ? cacheKeyString.split(',') : [];
-    var cacheData = {};
-    var content = [];
-
-    if (cacheKeyString !== null && cacheKeys.length > 0) {
-        cacheData = cache.getAll(cacheKeys);
-
-        for (var key in cacheKeys) {
-            if (cacheData[cacheKeys[key]] != undefined) {
-                content.push(JSON.parse(cacheData[cacheKeys[key]]));
-            }
-        }
-    } else {
-        content = fetchJSON(url);
-
-        for (var key in content) {
-            cacheData[cacheKey + '.' + key] = JSON.stringify(content[key]);
-        }
-
-        cache.putAll(cacheData);
-        cache.put(cacheKey + '.keys', Object.keys(cacheData), cacheExpTime);
-    }
-
-    return content;
-}
-
-/**
  * Fetches data. Either by calling getCachedData or fetchJSON, depending on the cache configuration parameter.
  *
  * @param   {String}  url   The URL to get the data from
- * @param   {Boolean} cache Parameter to determine whether the request should be cached
+ *
  * @returns {Object}        The response object
  */
-function fetchData(url, cache) {
+function fetchData(url) {
     if (!url || !url.match(/^https?:\/\/.+$/g)) {
         sendUserError('"' + url + '" is not a valid url.');
     }
     try {
-        var content = cache ? getCachedData(url) : fetchJSON(url);
+        var content = fetchJSON(url);
     } catch (e) {
         sendUserError(
             'Your request could not be cached. The rows of your dataset probably exceed the 100KB cache limit.'
@@ -224,9 +113,10 @@ function createField(fields, types, key, value) {
  * @returns {String}  if true
  */
 function getElementKey(key, currentKey) {
-    if (currentKey == '' || currentKey == null) {
-        return;
+    if (currentKey === '' || currentKey === null) {
+        return '';
     }
+
     if (key != null) {
         return key + '.' + currentKey.replace('.', '_');
     }
@@ -266,7 +156,6 @@ function createFields(fields, types, key, value, isInline) {
  * @return  {Object}           An object with the connector configuration
  */
 function getFields(request, content) {
-    var cc = DataStudioApp.createCommunityConnector();
     var fields = cc.getFields();
     var types = cc.FieldType;
     var aggregations = cc.AggregationType;
@@ -283,18 +172,6 @@ function getFields(request, content) {
         sendUserError('Unable to identify the data format of one of your fields.');
     }
     return fields;
-}
-
-/**
- * Returns the schema for the given request.
- *
- * @param   {Object} request Schema request parameters.
- * @returns {Object} Schema for the given request.
- */
-function getSchema(request) {
-    var content = fetchData(request.configParams.url, request.configParams.cache);
-    var fields = getFields(request, content).build();
-    return {schema: fields};
 }
 
 /**
@@ -362,7 +239,8 @@ function validateValue(field, val) {
         case 'object':
             return JSON.stringify(val);
     }
-    return '';
+
+    return null;
 }
 
 /**
@@ -370,7 +248,7 @@ function validateValue(field, val) {
  *
  * @param   {Object} valuePaths       Field name. If nested; field name and parent field name
  * @param   {Object} row              Current content row
- * @returns {Mixed}                   The field values for the columns
+ * @returns {any}                   The field values for the columns
  */
 function getColumnValue(valuePaths, row) {
     for (var index in valuePaths) {
@@ -421,13 +299,63 @@ function getColumns(content, requestedFields) {
 }
 
 /**
+ * function  `getAuthType()`
+ *
+ * @returns {Object} `AuthType` used by the connector.
+ */
+function getAuthType() {
+    return {type: 'NONE'};
+}
+
+/**
+ * Returns the user configurable options for the connector.
+ *
+ * Required function for Community Connector.
+ *
+ * @param   {Object} request  Config request parameters.
+ * @returns {Object}          Connector configuration to be displayed to the user.
+ */
+function getConfig(request) {
+
+    var config = cc.getConfig();
+
+    config
+        .newInfo()
+        .setId('instructions')
+        .setText('Fill out the form to connect to a JSON data source.');
+
+    config
+        .newTextInput()
+        .setId('url')
+        .setName('Enter the URL of a JSON data source')
+        .setHelpText('e.g. https://wp-domain-url.org/')
+        .setPlaceholder('https://wp-domain-url.org/');
+
+    config.setDateRangeRequired(false);
+
+    return config.build();
+}
+
+/**
+ * Returns the schema for the given request.
+ *
+ * @param   {Object} request Schema request parameters.
+ * @returns {Object} Schema for the given request.
+ */
+function getSchema(request) {
+    var content = fetchData(request.configParams.url);
+    var fields = getFields(request, content).build();
+    return {schema: fields};
+}
+
+/**
  * Returns the tabular data for the given request.
  *
  * @param   {Object} request  Data request parameters.
  * @returns {Object}          Contains the schema and data for the given request.
  */
 function getData(request) {
-    var content = fetchData(request.configParams.url, request.configParams.cache);
+    var content = fetchData(request.configParams.url);
     var fields = getFields(request, content);
     var requestedFieldIds = request.fields.map(function(field) {
         return field.name;
