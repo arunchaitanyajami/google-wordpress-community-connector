@@ -117,7 +117,7 @@ function getElementKey(key, currentKey) {
  * @param   {Object}  fields  The list of fields
  * @param   {Object}  types   The list of types
  * @param   {String}  key     The key value of the current element
- * @param   {Mixed}   value   The value of the current element
+ * @param   {any[]}   value   The value of the current element
  */
 function createFields(fields, types, key, value) {
     if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
@@ -147,8 +147,15 @@ function getFields(request, content) {
     var types = cc.FieldType;
     var aggregations = cc.AggregationType;
 
+    if (!Array.isArray(content)) content = [content];
+    sendUserError( JSON.stringify( content[0] ) );
+
+    if (typeof content[0] !== 'object' || content[0] === null) {
+        sendUserError('Invalid JSON format');
+    }
+
     try {
-        createFields(fields, types, null, content);
+        createFields(fields, types, null, content[0] );
     } catch (e) {
         sendUserError('Unable to identify the data format of one of your fields.');
     }
