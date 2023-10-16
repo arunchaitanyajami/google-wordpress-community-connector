@@ -67,7 +67,7 @@ function fetchData(url) {
  * @return  {string}          The semantic type
  */
 function getSemanticType(value, types) {
-    if (!isNaN(parseFloat(value)) && isFinite(value)) {
+    if ( !isNaN(parseInt(value) ) ) {
         return types.NUMBER;
     } else if (value === true || value === false) {
         return types.BOOLEAN;
@@ -84,6 +84,7 @@ function getSemanticType(value, types) {
             return types.YEAR_MONTH_DAY_HOUR;
         }
     }
+
     return types.TEXT;
 }
 
