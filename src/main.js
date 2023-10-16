@@ -60,6 +60,8 @@ function fetchData(url) {
     }
     if (!content) sendUserError('"' + url + '" returned no content.');
 
+    sendUserError( content );
+
     return content;
 }
 
@@ -88,7 +90,7 @@ function createField(fields, types, key, value) {
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setDescription( isNumeric(value) + " >> " + typeof value + " >> " + Object.keys( value )[0] );
+    field.setDescription( isNumeric(value) + " >> " + typeof value + " >> " + key );
     field.setName(key);
 }
 
@@ -117,17 +119,16 @@ function getElementKey(key, currentKey) {
  * @param   {Object}  types   The list of types
  * @param   {String}  key     The key value of the current element
  * @param   {Mixed}   value   The value of the current element
- * @param   {boolean} isInline if true
  */
-function createFields(fields, types, key, value, isInline) {
+function createFields(fields, types, key, value) {
     if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
         Object.keys(value).forEach(function(currentKey) {
             var elementKey = getElementKey(key, currentKey);
 
-            if (isInline && value[currentKey] != null) {
+            if (value[currentKey] != null) {
                 createFields(fields, types, elementKey, value[currentKey], isInline);
             } else {
-                createField(fields, types, currentKey, value[currentKey]);
+                createField(fields, types, currentKey, value);
             }
         });
     } else if (key !== null) {
@@ -146,7 +147,6 @@ function getFields(request, content) {
     var fields = cc.getFields();
     var types = cc.FieldType;
     var aggregations = cc.AggregationType;
-    var isInline = request.configParams.nestedData === 'inline';
 
     if (!Array.isArray(content)) content = [content];
 
@@ -154,41 +154,12 @@ function getFields(request, content) {
         sendUserError('Invalid JSON format');
     }
     try {
-        createFields(fields, types, null, content[0], isInline);
+        createFields(fields, types, null, content[0] );
     } catch (e) {
         sendUserError('Unable to identify the data format of one of your fields.');
     }
 
     return fields;
-}
-
-/**
- * Performs a deep merge of objects and returns new object. Does not modify
- * objects (immutable) and merges arrays via concatenation.
- * Thanks to jhildenbiddle https://stackoverflow.com/users/4903063/jhildenbiddle
- * https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
- *
- * @param            Objects to merge
- * @returns {object} New object with merged key/values
- */
-function mergeDeep() {
-    var objects = Array.prototype.slice.call(arguments);
-
-    return objects.reduce(function(prev, obj) {
-        Object.keys(obj).forEach(function(key) {
-            var pVal = prev[key];
-            var oVal = obj[key];
-
-            if (Array.isArray(pVal) && Array.isArray(oVal)) {
-                prev[key] = pVal.concat.apply(pVal, toConsumableArray(oVal));
-            } else if (pVal === Object(pVal) && oVal === Object(oVal)) {
-                prev[key] = mergeDeep(pVal, oVal);
-            } else {
-                prev[key] = oVal;
-            }
-        });
-        return prev;
-    }, {});
 }
 
 /**
