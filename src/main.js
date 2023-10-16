@@ -88,7 +88,7 @@ function createField(fields, types, key, value) {
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setDescription( isNumeric( value ) + " >> " + key );
+    field.setDescription( isNumeric( value ) + " >> " + typeof value + " >> " + key );
     field.setName(key);
 }
 
