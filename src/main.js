@@ -71,7 +71,7 @@ function fetchData(url) {
  * @return  {string}          The semantic type
  */
 function getSemanticType(value, types) {
-    return isNumeric( value ) ? types.NUMBER : types.TEXT;
+    return isNumeric(value) ? types.NUMBER : types.TEXT;
 }
 
 /**
@@ -88,7 +88,7 @@ function createField(fields, types, key, value) {
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setDescription( isNumeric(value) + " >> " + typeof value + " >> " + key );
+    field.setDescription(isNumeric(value) + " >> " + typeof value + " >> " + key);
     field.setName(key);
 }
 
@@ -107,6 +107,7 @@ function getElementKey(key, currentKey) {
     if (key != null) {
         return key + '.' + currentKey.replace('.', '_');
     }
+
     return currentKey.replace('.', '_');
 }
 
@@ -120,11 +121,11 @@ function getElementKey(key, currentKey) {
  */
 function createFields(fields, types, key, value) {
     if (typeof value === 'object' && !Array.isArray(value) && value !== null) {
-        Object.keys(value).forEach(function(currentKey) {
+        Object.keys(value).forEach(function (currentKey) {
             var elementKey = getElementKey(key, currentKey);
 
-            if (value[currentKey] != null) {
-                createFields(fields, types, elementKey, value[currentKey], isInline);
+            if (value[currentKey] !== null && typeof value[currentKey] === 'object') {
+                createFields(fields, types, elementKey, value[currentKey]);
             } else {
                 createField(fields, types, currentKey, value);
             }
@@ -146,10 +147,8 @@ function getFields(request, content) {
     var types = cc.FieldType;
     var aggregations = cc.AggregationType;
 
-    sendUserError( typeof content[0] );
-
     try {
-        createFields(fields, types, null, content );
+        createFields(fields, types, null, content);
     } catch (e) {
         sendUserError('Unable to identify the data format of one of your fields.');
     }
@@ -239,10 +238,10 @@ function getColumnValue(valuePaths, row) {
 function getColumns(content, requestedFields) {
     if (!Array.isArray(content)) content = [content];
 
-    return content.map(function(row) {
+    return content.map(function (row) {
         var rowValues = [];
 
-        requestedFields.asArray().forEach(function(field) {
+        requestedFields.asArray().forEach(function (field) {
             var valuePaths = field.getId().split('.');
             var fieldValue = row === null ? '' : getColumnValue(valuePaths, row);
 
@@ -321,7 +320,7 @@ function getSchema(request) {
 function getData(request) {
     var content = fetchData(request.configParams.url);
     var fields = getFields(request, content);
-    var requestedFieldIds = request.fields.map(function(field) {
+    var requestedFieldIds = request.fields.map(function (field) {
         return field.name;
     });
     var requestedFields = fields.forIds(requestedFieldIds);
