@@ -3,6 +3,12 @@
 
 var cc = DataStudioApp.createCommunityConnector();
 
+function isNumeric(str) {
+    if (typeof str != "string") return false // we only process strings!
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
+
 /**
  * Throws and logs script exceptions.
  *
@@ -67,7 +73,7 @@ function fetchData(url) {
  * @return  {string}          The semantic type
  */
 function getSemanticType(value, types) {
-    if ( !isNaN(parseInt(value) ) ) {
+    if ( isNumeric(value) ) {
         return types.NUMBER;
     } else if (value === true || value === false) {
         return types.BOOLEAN;
