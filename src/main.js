@@ -89,7 +89,7 @@ function getSemanticType(value, types) {
         }
     }
 
-    return types.TEXT;
+    return isNumeric(value) ? types.NUMBER : types.TEXT;
 }
 
 /**
