@@ -1,7 +1,7 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable prefer-spread */
 
-const cc = DataStudioApp.createCommunityConnector();
+var cc = DataStudioApp.createCommunityConnector();
 
 /**
  * Throws and logs script exceptions.
