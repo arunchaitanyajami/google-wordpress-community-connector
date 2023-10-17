@@ -8,6 +8,16 @@ function isNumeric(value) {
 }
 
 /**
+ * If is url.
+ * @param string
+ * @returns {boolean}
+ */
+function isValidURL(string) {
+    var res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+    return (res !== null)
+};
+
+/**
  * Throws and logs script exceptions.
  *
  * @param {String} message The exception message
@@ -77,6 +87,8 @@ function getSemanticType(value, types) {
         return types.BOOLEAN;
     } else if (!isNaN(Date.parse(value))) {
         return types.YEAR_MONTH_DAY_HOUR;
+    } else if (isValidURL(value)) {
+        return types.URL;
     }
 
     return types.TEXT;
