@@ -113,7 +113,7 @@ function createField(fields, types, key, value) {
 
     field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setDescription(key + ' >> ' + validURL(value));
+    field.setDescription(key);
     field.setName(key);
 }
 
