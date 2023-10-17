@@ -9,13 +9,18 @@ function isNumeric(value) {
 
 /**
  * If is url.
- * @param string
  * @returns {boolean}
+ * @param str
  */
-function isValidURL(string) {
-    var res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
-    return (res !== null)
-};
+function validURL(str) {
+    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+    return !!pattern.test(str);
+}
 
 /**
  * Throws and logs script exceptions.
@@ -87,7 +92,7 @@ function getSemanticType(value, types) {
         return types.BOOLEAN;
     } else if (!isNaN(Date.parse(value))) {
         return types.YEAR_MONTH_DAY_HOUR;
-    } else if (isValidURL(value)) {
+    } else if (validURL(value)) {
         return types.URL;
     }
 
