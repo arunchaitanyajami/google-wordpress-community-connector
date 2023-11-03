@@ -1,6 +1,6 @@
 {
   "name": "google-wordpress-community-connector",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Wordpress Community Connector for Google Looker Studio",
   "main": "Code.js",
   "author": "",

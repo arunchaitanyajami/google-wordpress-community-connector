@@ -7,6 +7,23 @@ function isNumeric(value) {
     return /^-?\d+$/.test(value);
 }
 
+function isLatitude(value) {
+    return typeof value === 'number' && value >= -90 && value <= 90;
+}
+
+function isLongitude(value) {
+    return typeof value === 'number' && value >= -180 && value <= 180;
+}
+
+function isLatitudeAndLongitude(value) {
+    var parts = value.split(',')
+    if (isLatitude(parts[0]) && isLongitude(parts[1])) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 /**
  * If is url.
  * @returns {boolean}
@@ -94,6 +111,8 @@ function getSemanticType(value, types) {
         return types.YEAR_MONTH_DAY_HOUR;
     } else if (validURL(value)) {
         return types.URL;
+    } else if (isLatitudeAndLongitude(value)) {
+        return types.LATITUDE_LONGITUDE;
     }
 
     return types.TEXT;
