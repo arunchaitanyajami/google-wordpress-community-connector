@@ -111,8 +111,6 @@ function getSemanticType(value, types) {
         return types.YEAR_MONTH_DAY_HOUR;
     } else if (validURL(value)) {
         return types.URL;
-    } else if (isLatitudeAndLongitude(value)) {
-        return types.LATITUDE_LONGITUDE;
     }
 
     return types.TEXT;
