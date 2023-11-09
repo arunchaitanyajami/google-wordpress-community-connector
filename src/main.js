@@ -119,13 +119,17 @@ function getSemanticType(value, types) {
  * @param   {Mixed}   value   The value of the current element
  */
 function createField(fields, types, key, value) {
+    var aggregations = cc.AggregationType;
     var semanticType = getSemanticType(value, types);
     var field = semanticType === types.NUMBER ? fields.newMetric() : fields.newDimension();
 
-    field.setType(semanticType);
     field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setDescription(key);
     field.setName(key);
+    field.setDescription(key + ' - ' + types.NUMBER + ' - ' + semanticType);
+    field.setType(semanticType);
+    if (semanticType === types.NUMBER) {
+        field.setAggregation(aggregations.SUM);
+    }
 }
 
 /**
