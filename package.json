@@ -6,8 +6,8 @@
   "author": "",
   "license": "ISC",
   "dsccConnector": {
-    "production": "AKfycbwURHkauguMPzj2gJKaFRYR4z3qqNDDVRngu8YIJHGelfIZBDjbZCQu_TqARz0uaxtb",
-    "latest": "AKfycbzWcrFPGGlkUczJiPXmf7C1q4-8mBez7CwuH7Vinn4"
+    "production": "AKfycbwq-Eei9942KmgwLyaavRLqPmZ9yWRMKKGVFTUgDnyzR0R_u3-j45ySb4s_sDPY1AdrdA",
+    "latest": "AKfycbxc1N2_-xb6xf3iyi_GuDNEb5expEgLrTcdv9X-3-Ik"
   },
   "scripts": {
     "prettier": "prettier --write \"src/**/*.js\"",
@@ -15,13 +15,16 @@
     "watch": "dscc-scripts connector watch_changes",
     "open": "dscc-scripts connector open_script",
     "open_template": "dscc-scripts connector open_template",
-    "try_production": "dscc-scripts connector try_production",
-    "try_latest": "dscc-scripts connector try_latest",
+    "try_production": "npm_package_dsccConnector_latest='AKfycbwq-Eei9942KmgwLyaavRLqPmZ9yWRMKKGVFTUgDnyzR0R_u3-j45ySb4s_sDPY1AdrdA' dscc-scripts connector try_production",
+    "try_latest": "npm_package_dsccConnector_latest='AKfycbxc1N2_-xb6xf3iyi_GuDNEb5expEgLrTcdv9X-3-Ik' dscc-scripts connector try_latest",
     "update_production": "dscc-scripts connector update_production"
   },
   "devDependencies": {
-    "@google/clasp": "^2.1.0",
-    "@google/dscc-scripts": "^1.0.0",
+    "@google/clasp": "^2.4.2",
+    "@google/dscc-scripts": "^1.0.17",
     "prettier": "^1.16.4"
+  },
+  "dependencies": {
+    "dotenv": "^16.3.1"
   }
 }
