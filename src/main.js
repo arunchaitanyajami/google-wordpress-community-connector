@@ -103,15 +103,15 @@ function fetchData(url) {
  * @return  {string}          The semantic type
  */
 function getSemanticType(value, types) {
-    // if (isNumeric(value)) {
-    //     return types.NUMBER;
-    // } else if (value === true || value === false) {
-    //     return types.BOOLEAN;
-    // } else if (!isNaN(Date.parse(value))) {
-    //     return types.YEAR_MONTH_DAY_HOUR;
-    // } else if (validURL(value)) {
-    //     return types.URL;
-    // }
+    if (isNumeric(value)) {
+        return types.NUMBER;
+    } else if (value === true || value === false) {
+        return types.BOOLEAN;
+    } else if (!isNaN(Date.parse(value))) {
+        return types.YEAR_MONTH_DAY_HOUR;
+    } else if (validURL(value)) {
+        return types.URL;
+    }
 
     return types.TEXT;
 }
