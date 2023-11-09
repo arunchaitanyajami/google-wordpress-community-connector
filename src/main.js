@@ -25,18 +25,12 @@ function isLatitudeAndLongitude(value) {
 }
 
 /**
- * If is url.
+ * Validate Url.
  * @returns {boolean}
  * @param str
  */
 function validURL(str) {
-    var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
-    return !!pattern.test(str);
+    return str.match(/^https?:\/\/.+$/g)
 }
 
 /**
@@ -105,6 +99,8 @@ function fetchData(url) {
 function getSemanticType(value, types) {
     if (isNumeric(value)) {
         return types.NUMBER;
+    } else if (value === true || value === false) {
+        return types.BOOLEAN;
     } else if (!isNaN(Date.parse(value))) {
         return types.YEAR_MONTH_DAY_HOUR;
     } else if (validURL(value)) {
