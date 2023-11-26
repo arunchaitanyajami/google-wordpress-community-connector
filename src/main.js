@@ -117,18 +117,30 @@ function getSemanticType(value, types) {
  * @param   {Object}  types   The list of types
  * @param   {String}  key     The key value of the current element
  * @param   {Mixed}   value   The value of the current element
+ * @param   {Object}   V2Object   The value of the current element
  */
-function createField(fields, types, key, value) {
-    var aggregations = cc.AggregationType;
-    var semanticType = getSemanticType(value, types);
-    var field = semanticType === types.NUMBER ? fields.newMetric() : fields.newDimension();
+function createField(fields, types, key, value, V2Object) {
+    if (V2Object) {
+        var field = V2Object.type === 'NUMBER' ? fields.newMetric() : fields.newDimension();
+        field.setId(key.replace(/\s/g, '_').toLowerCase());
+        field.setName(V2Object.name);
+        field.setDescription(V2Object.description);
+        field.setType(V2Object.type);
+        if (V2Object.type === 'NUMBER') {
+            field.setAggregation(V2Object.aggregation);
+        }
+    } else {
+        var aggregations = cc.AggregationType;
+        var semanticType = getSemanticType(value, types);
+        var field = semanticType === types.NUMBER ? fields.newMetric() : fields.newDimension();
 
-    field.setId(key.replace(/\s/g, '_').toLowerCase());
-    field.setName(key);
-    field.setDescription(key + ' - ' + types.NUMBER + ' - ' + semanticType);
-    field.setType(semanticType);
-    if (semanticType === types.NUMBER) {
-        field.setAggregation(aggregations.SUM);
+        field.setId(key.replace(/\s/g, '_').toLowerCase());
+        field.setName(key);
+        field.setDescription(key);
+        field.setType(semanticType);
+        if (semanticType === types.NUMBER) {
+            field.setAggregation(aggregations.SUM);
+        }
     }
 }
 
@@ -167,7 +179,7 @@ function createFields(fields, types, key, value) {
             if (value[currentKey] !== null && typeof value[currentKey] === 'object') {
                 createFields(fields, types, elementKey, value[currentKey]);
             } else {
-                createField(fields, types, currentKey, value[currentKey]);
+                createField(fields, types, currentKey, value[currentKey] );
             }
         });
     } else if (key !== null) {
@@ -201,6 +213,33 @@ function getFields(request, content) {
 
     return fields;
 }
+
+/**
+ * Parse fields for v2.
+ *
+ * @param   {Object}  request getSchema/getData request parameter.
+ * @param   {Object}  content The content object
+ * @return  {Object}           An object with the connector configuration
+ */
+function getFieldsV2(request, content) {
+    var fields = cc.getFields();
+    var types = cc.FieldType;
+    if (typeof content !== 'object' || content === null) {
+        sendUserError('Invalid JSON format');
+    }
+
+    try {
+        Object.keys(content).forEach(function (currentKey ) {
+            createField( fields, types, currentKey, content[currentKey].value, content[currentKey] );
+        });
+    } catch (e) {
+        sendUserError('Unable to identify the data format of one of your fields.');
+    }
+
+    return fields;
+}
+
+
 
 /**
  *  Converts date strings to YYYYMMDDHH:mm:ss
@@ -340,6 +379,12 @@ function getConfig(request) {
         .setHelpText('e.g. https://wp-domain-url.org/')
         .setPlaceholder('https://wp-domain-url.org/');
 
+    config
+        .newTextInput()
+        .setId('subscription_key')
+        .setName('Enter Subscription Key')
+        .setHelpText('Free to use any random string for now ');
+
     config.setDateRangeRequired(false);
 
     return config.build();
@@ -352,8 +397,15 @@ function getConfig(request) {
  * @returns {Object} Schema for the given request.
  */
 function getSchema(request) {
-    var content = fetchData(request.configParams.url);
-    var fields = getFields(request, content).build();
+    var url_args = request.configParams.subscription_key ? '?skeleton=1&skeleton_type=1' : '';
+    var content = fetchData(request.configParams.url + url_args );
+    var fields = '';
+    if( request.configParams.subscription_key ){
+        fields = getFieldsV2(request, content).build();
+    }else{
+        fields = getFields(request, content).build();
+    }
+
     return {schema: fields};
 }
 
