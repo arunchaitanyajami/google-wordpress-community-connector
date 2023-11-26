@@ -94,9 +94,126 @@ function fetchData(url) {
  *
  * @param   {Mixed}   value   The field value
  * @param   {Object}  types   The list of types
+ * @param   {string}  V2ObjectType
+ *
  * @return  {string}          The semantic type
  */
-function getSemanticType(value, types) {
+function getSemanticType(value, types, V2ObjectType) {
+    if (V2ObjectType) {
+        switch (V2ObjectType) {
+            case 'NUMBER':
+                return types.NUMBER;
+
+            case 'PERCENT':
+                return types.PERCENT;
+
+            case 'TEXT':
+                return types.TEXT;
+
+            case 'BOOLEAN':
+                return types.BOOLEAN;
+
+            case 'URL':
+                return types.URL;
+
+            case 'HYPERLINK':
+                return types.URL;
+
+            case 'IMAGE':
+                return types.IMAGE;
+
+            case 'IMAGELINK':
+                return types.IMAGELINK;
+
+            case 'YEAR':
+                return types.YEAR;
+
+            case 'YEAR_QUARTER':
+                return types.YEAR_QUARTER;
+
+            case 'YEAR_MONTH':
+                return types.YEAR_MONTH;
+
+            case 'YEAR_WEEK':
+                return types.YEAR_WEEK;
+
+            case 'YEAR_MONTH_DAY':
+                return types.YEAR_MONTH_DAY;
+
+            case 'YEAR_MONTH_DAY_HOUR':
+                return types.YEAR_MONTH_DAY_HOUR;
+
+            case 'YEAR_MONTH_DAY_SECOND':
+                return types.YEAR_MONTH_DAY_HOUR;
+
+            case 'QUARTER':
+                return types.QUARTER;
+
+            case 'MONTH':
+                return types.MONTH;
+
+            case 'WEEK':
+                return types.WEEK;
+
+            case 'MONTH_DAY':
+                return types.MONTH_DAY;
+
+            case 'DAY_OF_WEEK':
+                return types.DAY_OF_WEEK;
+
+            case 'DAY':
+                return types.DAY;
+
+            case 'HOUR':
+                return types.HOUR;
+
+            case 'MINUTE':
+                return types.MINUTE;
+
+            case 'DURATION':
+                return types.DURATION;
+
+            case 'COUNTRY':
+                return types.COUNTRY;
+
+            case 'COUNTRY_CODE':
+                return types.COUNTRY_CODE;
+
+            case 'CONTINENT':
+                return types.CONTINENT;
+
+            case 'CONTINENT_CODE':
+                return types.CONTINENT_CODE;
+
+            case 'SUB_CONTINENT':
+                return types.SUB_CONTINENT;
+
+            case 'SUB_CONTINENT_CODE':
+                return types.SUB_CONTINENT_CODE;
+
+            case 'REGION':
+                return types.REGION;
+
+            case 'REGION_CODE':
+                return types.REGION_CODE;
+
+            case 'CITY':
+                return types.CITY;
+
+            case 'CITY_CODE':
+                return types.CITY_CODE;
+
+            case 'METRO_CODE':
+                return types.METRO_CODE;
+
+            case 'LATITUDE_LONGITUDE':
+                return types.LATITUDE_LONGITUDE;
+
+            default:
+                return types.TEXT;
+        }
+    }
+
     if (isNumeric(value)) {
         return types.NUMBER;
     } else if (value === true || value === false) {
@@ -110,6 +227,38 @@ function getSemanticType(value, types) {
     return types.TEXT;
 }
 
+function getAggregation(V2ObjectAggregation, aggregations) {
+    if ('AUTO' === V2ObjectAggregation) {
+        return aggregations.AUTO
+    }
+
+    if ('SUM' === V2ObjectAggregation) {
+        return aggregations.SUM
+    }
+
+    if ('MIN' === V2ObjectAggregation) {
+        return aggregations.MIN
+    }
+
+    if ('MAX' === V2ObjectAggregation) {
+        return aggregations.MAX
+    }
+
+    if ('COUNT' === V2ObjectAggregation) {
+        return aggregations.COUNT
+    }
+
+    if ('COUNT_DISTINCT' === V2ObjectAggregation) {
+        return aggregations.COUNT_DISTINCT
+    }
+
+    if ('AVG' === V2ObjectAggregation) {
+        return aggregations.AVG
+    }
+
+    return aggregations.AUT;
+}
+
 /**
  *  Creates the fields
  *
@@ -120,28 +269,31 @@ function getSemanticType(value, types) {
  * @param   {Object}   V2Object   The value of the current element
  */
 function createField(fields, types, key, value, V2Object) {
-    if (V2Object) {
-        var field = V2Object.type === 'NUMBER' ? fields.newMetric() : fields.newDimension();
-        field.setId(key.replace(/\s/g, '_').toLowerCase());
-        field.setName(V2Object.name);
-        field.setDescription(V2Object.description);
-        field.setType(V2Object.type);
-        if (V2Object.type === 'NUMBER') {
-            field.setAggregation(V2Object.aggregation);
-        }
-    } else {
-        var aggregations = cc.AggregationType;
-        var semanticType = getSemanticType(value, types);
-        var field = semanticType === types.NUMBER ? fields.newMetric() : fields.newDimension();
+    var V2ObjectType = V2Object && V2Object.type ? V2Object.type : ''
+    var aggregations = cc.AggregationType;
+    var semanticType = getSemanticType(value, types, V2ObjectType);
+    var field = semanticType === types.NUMBER ? fields.newMetric() : fields.newDimension();
 
-        field.setId(key.replace(/\s/g, '_').toLowerCase());
-        field.setName(key);
-        field.setDescription(key);
-        field.setType(semanticType);
-        if (semanticType === types.NUMBER) {
+    var fieldKey = key.replace(/\s/g, '_').toLowerCase();
+    var fieldName = V2Object ? V2Object.name : key;
+    var fieldDescription = V2Object ? V2Object.description : key;
+    var fieldAggregation = V2Object ? getAggregation(V2Object.aggregation, aggregations) : aggregations.SUM;
+
+    field.setId(fieldKey);
+    field.setName(fieldName);
+    field.setDescription(fieldDescription);
+    field.setType(semanticType);
+    if (semanticType === types.NUMBER) {
+        if (V2Object && V2Object.aggregation !== 'NONE') {
+            field.setAggregation(fieldAggregation);
+        } else {
             field.setAggregation(aggregations.SUM);
         }
     }
+
+    // if (V2Object && V2Object.formula !== '') {
+    //     field.setFormula(V2Object.formula);
+    // }
 }
 
 /**
@@ -179,7 +331,7 @@ function createFields(fields, types, key, value) {
             if (value[currentKey] !== null && typeof value[currentKey] === 'object') {
                 createFields(fields, types, elementKey, value[currentKey]);
             } else {
-                createField(fields, types, currentKey, value[currentKey] );
+                createField(fields, types, currentKey, value[currentKey]);
             }
         });
     } else if (key !== null) {
@@ -197,7 +349,6 @@ function createFields(fields, types, key, value) {
 function getFields(request, content) {
     var fields = cc.getFields();
     var types = cc.FieldType;
-    var aggregations = cc.AggregationType;
 
     if (!Array.isArray(content)) content = [content];
 
@@ -206,7 +357,7 @@ function getFields(request, content) {
     }
 
     try {
-        createFields(fields, types, null, content[0] );
+        createFields(fields, types, null, content[0]);
     } catch (e) {
         sendUserError('Unable to identify the data format of one of your fields.');
     }
@@ -229,8 +380,8 @@ function getFieldsV2(request, content) {
     }
 
     try {
-        Object.keys(content).forEach(function (currentKey ) {
-            createField( fields, types, currentKey, content[currentKey].value, content[currentKey] );
+        Object.keys(content).forEach(function (currentKey) {
+            createField(fields, types, currentKey, content[currentKey].value, content[currentKey]);
         });
     } catch (e) {
         sendUserError('Unable to identify the data format of one of your fields.');
@@ -238,7 +389,6 @@ function getFieldsV2(request, content) {
 
     return fields;
 }
-
 
 
 /**
@@ -398,11 +548,11 @@ function getConfig(request) {
  */
 function getSchema(request) {
     var url_args = request.configParams.subscription_key ? '?skeleton=1&skeleton_type=1' : '';
-    var content = fetchData(request.configParams.url + url_args );
+    var content = fetchData(request.configParams.url + url_args);
     var fields = '';
-    if( request.configParams.subscription_key ){
+    if (request.configParams.subscription_key) {
         fields = getFieldsV2(request, content).build();
-    }else{
+    } else {
         fields = getFields(request, content).build();
     }
 
