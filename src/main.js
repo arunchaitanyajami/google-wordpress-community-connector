@@ -529,7 +529,7 @@ function getConfig(request) {
         .addOption(config.newOptionBuilder().setLabel("Free").setValue("free"))
         .addOption(config.newOptionBuilder().setLabel("Paid").setValue("paid"));
 
-    if ( !isFirstRequest && 'paid' === configParams.subscriptionType ) {
+    if (!isFirstRequest && 'paid' === configParams.subscriptionType) {
         config
             .newInfo()
             .setId('instructions')
@@ -549,7 +549,7 @@ function getConfig(request) {
             .setHelpText('Free to use any random string for now ');
     }
 
-    if ( !isFirstRequest && 'free' === configParams.subscriptionType ) {
+    if (!isFirstRequest && 'free' === configParams.subscriptionType) {
         config
             .newTextInput()
             .setId('url')
