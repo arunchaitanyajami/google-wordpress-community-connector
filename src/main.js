@@ -514,26 +514,40 @@ function getAuthType() {
  * @returns {Object}          Connector configuration to be displayed to the user.
  */
 function getConfig(request) {
-
+    var configParams = request.configParams;
+    var isFirstRequest = configParams === undefined;
     var config = cc.getConfig();
 
-    config
-        .newInfo()
-        .setId('instructions')
-        .setText('Fill out the form to connect to a JSON data source.');
+    if (isFirstRequest) {
+        config.setIsSteppedConfig(true);
+    }
 
-    config
-        .newTextInput()
-        .setId('url')
-        .setName('Enter the URL of a JSON data source')
-        .setHelpText('e.g. https://wp-domain-url.org/')
-        .setPlaceholder('https://wp-domain-url.org/');
+    config.newSelectSingle()
+        .setId("subscriptionType")
+        .setName("Subscription Type")
+        .setIsDynamic(true)
+        .addOption(config.newOptionBuilder().setLabel("Free").setValue("free"))
+        .addOption(config.newOptionBuilder().setLabel("Paid").setValue("paid"));
 
-    config
-        .newTextInput()
-        .setId('subscription_key')
-        .setName('Enter Subscription Key')
-        .setHelpText('Free to use any random string for now ');
+    if ( !isFirstRequest && 'paid' === configParams.subscriptionType ) {
+        config
+            .newInfo()
+            .setId('instructions')
+            .setText('Fill out the form to connect to a JSON data source.');
+
+        config
+            .newTextInput()
+            .setId('url')
+            .setName('Enter the URL of a JSON data source.')
+            .setHelpText('e.g. https://wp-domain-url.org/')
+            .setPlaceholder('https://wp-domain-url.org/');
+
+        config
+            .newTextInput()
+            .setId('subscription_key')
+            .setName('Enter Subscription Key')
+            .setHelpText('Free to use any random string for now ');
+    }
 
     config.setDateRangeRequired(false);
 

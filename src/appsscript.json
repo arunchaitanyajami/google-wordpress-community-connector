@@ -1,9 +1,9 @@
 {
   "dataStudio": {
     "name": "WP Community Connector",
-    "logoUrl": "https://raw.githubusercontent.com/arunchaitanyajami/google-wordpress-community-connector/main/assets/community-connectors-logo.png",
+    "logoUrl": "https://wpcommunityconnector.com/wp-content/uploads/2023/12/New-Project-2-1-e1702284795886.png",
     "company": "arunchaitanyajami",
-    "companyUrl": "https://iamarunchaitanyajami.com/",
+    "companyUrl": "https://wpcommunityconnector.com",
     "addonUrl": "https://github.com/arunchaitanyajami/google-wordpress-community-connector/blob/main/README.md",
     "supportUrl": "https://github.com/arunchaitanyajami/google-wordpress-community-connector/issues",
     "shortDescription": "Connect WordPress to Looker Studio",
