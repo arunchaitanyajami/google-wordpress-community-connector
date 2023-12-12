@@ -502,7 +502,9 @@ function isAdminUser() {
  * @returns {Object} `AuthType` used by the connector.
  */
 function getAuthType() {
-    return {type: 'NONE'};
+    return cc.newAuthTypeResponse()
+        .setAuthType(cc.AuthType.NONE)
+        .build();
 }
 
 /**
