@@ -539,14 +539,23 @@ function getConfig(request) {
             .newTextInput()
             .setId('url')
             .setName('Enter the URL of a JSON data source.')
-            .setHelpText('e.g. https://wp-domain-url.org/')
-            .setPlaceholder('https://wp-domain-url.org/');
+            .setHelpText('e.g.  https://wp-domain-url.org/wp-json/wp/v2/posts/reports')
+            .setPlaceholder(' https://wp-domain-url.org/wp-json/wp/v2/posts/reports');
 
         config
             .newTextInput()
             .setId('subscription_key')
             .setName('Enter Subscription Key')
             .setHelpText('Free to use any random string for now ');
+    }
+
+    if ( !isFirstRequest && 'free' === configParams.subscriptionType ) {
+        config
+            .newTextInput()
+            .setId('url')
+            .setName('Enter the URL of a JSON data source.')
+            .setHelpText('e.g. https://wp-domain-url.org/wp-json/wp/v2/posts/reports')
+            .setPlaceholder('https://wp-domain-url.org/wp-json/wp/v2/posts/reports');
     }
 
     config.setDateRangeRequired(false);
